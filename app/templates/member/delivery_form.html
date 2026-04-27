@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Request Delivery - LMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="h4 mb-3">Request Home Delivery</h1>
+        <p class="text-muted">Loan ID: {{ loan.loanID }} | Book: {{ loan.book.title }}</p>
+        <form method="post" action="{{ url_for('member.request_delivery', loan_id=loan.loanID) }}" class="js-disable-on-submit">
+          <div class="mb-3">
+            <label class="form-label" for="delivery_address">Delivery Address</label>
+            <textarea id="delivery_address" class="form-control" name="delivery_address" rows="4" maxlength="500" required></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Submit Request</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('member.my_loans') }}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

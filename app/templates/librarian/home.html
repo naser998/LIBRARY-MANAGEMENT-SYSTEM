@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Librarian Home - LMS{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="text-muted mb-1">Pending Deliveries</p>
+        <h2 class="display-6 mb-2">{{ pending_deliveries_count or 0 }}</h2>
+        <a href="{{ url_for('librarian.deliveries') }}" class="btn btn-outline-primary btn-sm">View Deliveries</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

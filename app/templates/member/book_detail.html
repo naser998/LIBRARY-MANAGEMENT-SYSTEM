@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Book Detail - LMS{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h4 mb-0">{{ book.title }}</h1>
+      <a href="{{ url_for('member.search') }}" class="btn btn-outline-secondary btn-sm">Back to Search</a>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6"><strong>Author:</strong> {{ book.author }}</div>
+      <div class="col-md-6"><strong>ISBN:</strong> {{ book.isbn }}</div>
+      <div class="col-md-6"><strong>Total Copies:</strong> {{ book.totalCopies }}</div>
+      <div class="col-md-6"><strong>Available Copies:</strong> {{ book.availableCopies }}</div>
+    </div>
+
+    {% if book.availableCopies == 0 and not has_active_reservation and not has_active_loan %}
+      <form method="post" action="{{ url_for('member.reserve_book', book_id=book.bookID) }}" class="js-disable-on-submit">
+        <button type="submit" class="btn btn-primary">Reserve for 24 Hours</button>
+      </form>
+    {% elif has_active_reservation %}
+      <span class="badge text-bg-info">You already have an active reservation.</span>
+    {% elif has_active_loan %}
+      <span class="badge text-bg-secondary">You already have this book on loan.</span>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

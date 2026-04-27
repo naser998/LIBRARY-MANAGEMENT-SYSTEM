@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Member Dashboard - LMS{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+    <div>
+      <h1 class="h4 mb-1">Hello, {{ session.get('username') }}</h1>
+      <p class="text-muted mb-0">Track your loans and discover books quickly.</p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex gap-2">
+      <a href="{{ url_for('member.search') }}" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass me-1"></i>Search Books</a>
+      <a href="{{ url_for('member.my_loans') }}" class="btn btn-outline-primary"><i class="fa-solid fa-receipt me-1"></i>My Loans</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="text-muted mb-1">Active Loans</p>
+        <h2 class="display-6 mb-0">{{ active_loans }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="text-muted mb-1">Overdue Loans</p>
+        <h2 class="display-6 mb-0 text-danger">{{ overdue_count }}</h2>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

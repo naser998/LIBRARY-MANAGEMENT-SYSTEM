@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Librarian Books - LMS{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+    <h1 class="h4 mb-0"><i class="fa-solid fa-book me-2 text-primary"></i>Book Management</h1>
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal"><i class="fa-solid fa-plus me-1"></i>Add Book</button>
+      <form method="post" action="{{ url_for('librarian.notify_overdue') }}" class="js-disable-on-submit">
+        <button type="submit" class="btn btn-outline-warning"><i class="fa-solid fa-triangle-exclamation me-1"></i>Notify Overdue</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <p class="text-muted mb-1">Pending Deliveries</p>
+        <h2 class="display-6 mb-2">{{ pending_deliveries_count or 0 }}</h2>
+        <a href="{{ url_for('librarian.deliveries') }}" class="btn btn-outline-primary btn-sm">View Deliveries</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle js-data-table" id="booksTable">
+        <thead>
+          <tr>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Genre</th>
+            <th>Location</th>
+            <th>Total</th>
+            <th>Available</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for book in books %}
+            <tr>
+              <td>{{ book.bookID }}</td>
+              <td>{{ book.title }}</td>
+              <td>{{ book.author }}</td>
+              <td>{{ book.isbn }}</td>
+              <td>{{ book.genre }}</td>
+              <td>{{ book.location }}</td>
+              <td>{{ book.totalCopies }}</td>
+              <td>{{ book.availableCopies }}</td>
+              <td class="text-end">
+                <button
+                  class="btn btn-sm btn-outline-primary me-1"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editBookModal"
+                  data-bookid="{{ book.bookID }}"
+                  data-title="{{ book.title }}"
+                  data-author="{{ book.author }}"
+                  data-isbn="{{ book.isbn }}"
+                  data-genre="{{ book.genre }}"
+                  data-location="{{ book.location }}"
+                  data-total="{{ book.totalCopies }}">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteBookModal"
+                  data-bookid="{{ book.bookID }}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="9" class="text-center text-muted py-4">No books available.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2 class="h6">Process Return</h2>
+    <form method="post" action="{{ url_for('librarian.process_return') }}" class="row g-2 js-disable-on-submit">
+      <div class="col-md-10"><input class="form-control" name="loanID" placeholder="Enter Loan ID" required></div>
+      <div class="col-md-2 d-grid"><button class="btn btn-warning" type="submit">Process</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('librarian.add_book') }}" class="js-disable-on-submit">
+        <div class="modal-header"><h3 class="h5 modal-title">Add Book</h3><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Book ID (optional)</label><input name="bookID" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">ISBN</label><input name="isbn" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">Title</label><input name="title" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">Author</label><input name="author" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">Genre</label><input name="genre" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">Location</label><input name="location" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">Total Copies</label><input type="number" min="1" name="totalCopies" class="form-control" required></div>
+          </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editBookModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('librarian.update_book') }}" class="js-disable-on-submit">
+        <div class="modal-header"><h3 class="h5 modal-title">Edit Book</h3><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Book ID</label><input id="editBookID" name="bookID" class="form-control" readonly required></div>
+            <div class="col-md-6"><label class="form-label">ISBN</label><input id="editISBN" name="isbn" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Title</label><input id="editTitle" name="title" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Author</label><input id="editAuthor" name="author" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Genre</label><input id="editGenre" name="genre" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Location</label><input id="editLocation" name="location" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Total Copies</label><input id="editTotal" type="number" min="0" name="totalCopies" class="form-control"></div>
+          </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Update</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteBookModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('librarian.delete_book') }}" class="js-disable-on-submit">
+        <div class="modal-header"><h3 class="h5 modal-title text-danger">Delete Book</h3><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <p class="mb-2">Are you sure you want to delete this book?</p>
+          <input id="deleteBookID" type="text" name="bookID" class="form-control" readonly required>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-danger">Delete</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const editModal = document.getElementById("editBookModal");
+  if (editModal) {
+    editModal.addEventListener("show.bs.modal", function (event) {
+      const b = event.relatedTarget;
+      document.getElementById("editBookID").value = b.getAttribute("data-bookid") || "";
+      document.getElementById("editTitle").value = b.getAttribute("data-title") || "";
+      document.getElementById("editAuthor").value = b.getAttribute("data-author") || "";
+      document.getElementById("editISBN").value = b.getAttribute("data-isbn") || "";
+      document.getElementById("editGenre").value = b.getAttribute("data-genre") || "";
+      document.getElementById("editLocation").value = b.getAttribute("data-location") || "";
+      document.getElementById("editTotal").value = b.getAttribute("data-total") || "";
+    });
+  }
+  const deleteModal = document.getElementById("deleteBookModal");
+  if (deleteModal) {
+    deleteModal.addEventListener("show.bs.modal", function (event) {
+      const b = event.relatedTarget;
+      document.getElementById("deleteBookID").value = b.getAttribute("data-bookid") || "";
+    });
+  }
+</script>
+{% endblock %}

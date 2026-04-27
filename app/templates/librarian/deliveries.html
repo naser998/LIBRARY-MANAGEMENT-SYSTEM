@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Pending Deliveries - LMS{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h4 mb-0"><i class="fa-solid fa-truck me-2 text-primary"></i>Pending Deliveries</h1>
+      <a href="{{ url_for('librarian.librarian_dashboard') }}" class="btn btn-outline-secondary btn-sm">Back</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Book</th>
+            <th>Address</th>
+            <th>Requested At</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for delivery in deliveries %}
+            <tr>
+              <td>{{ delivery.member.username }}</td>
+              <td>{{ delivery.loan.book.title }}</td>
+              <td>{{ delivery.delivery_address }}</td>
+              <td>{{ delivery.requested_at }}</td>
+              <td class="text-end">
+                <form method="post" action="{{ url_for('librarian.mark_delivered', delivery_id=delivery.id) }}" class="d-inline-flex gap-2 js-disable-on-submit">
+                  <input class="form-control form-control-sm" name="notes" placeholder="Notes (optional)" maxlength="500">
+                  <button type="submit" class="btn btn-success btn-sm">Mark as Delivered</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-center text-muted py-4">No pending deliveries.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

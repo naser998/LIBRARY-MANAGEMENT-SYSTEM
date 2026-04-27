@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Admin Users - LMS{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h1 class="h4 mb-3"><i class="fa-solid fa-users me-2 text-primary"></i>User Management</h1>
+    <form method="post" action="{{ url_for('admin.user_management') }}" class="js-disable-on-submit">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Action</label>
+          <select class="form-select" name="action" required>
+            <option value="create">Create</option>
+            <option value="update">Update</option>
+            <option value="delete">Delete</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">User ID</label>
+          <input class="form-control" name="userID" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Role</label>
+          <select class="form-select" name="role">
+            <option value="">Select role</option>
+            <option value="MEMBER">MEMBER</option>
+            <option value="LIBRARIAN">LIBRARIAN</option>
+            <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Username</label>
+          <input class="form-control" name="username">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input class="form-control" type="email" name="email">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Password</label>
+          <input class="form-control" type="password" name="password">
+        </div>
+      </div>
+      <button class="btn btn-primary mt-3" type="submit"><i class="fa-solid fa-floppy-disk me-1"></i>Submit Action</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <p class="text-muted mb-0">Tip: Use <strong>Create</strong> with role/username/email/password filled, <strong>Update</strong> with userID + fields to change, or <strong>Delete</strong> with userID only.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Admin Reports - LMS{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h1 class="h4 mb-3"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Reports</h1>
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item" role="presentation"><button class="nav-link {% if report_type == 'overdue' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-overdue" type="button">Overdue</button></li>
+      <li class="nav-item" role="presentation"><button class="nav-link {% if report_type == 'borrowing' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-borrowing" type="button">Borrowing</button></li>
+      <li class="nav-item" role="presentation"><button class="nav-link {% if report_type == 'inventory' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-inventory" type="button">Inventory</button></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane fade {% if report_type == 'overdue' %}show active{% endif %}" id="tab-overdue">
+        <form method="post" action="{{ url_for('admin.reports') }}" class="row g-2 js-disable-on-submit">
+          <input type="hidden" name="reportType" value="overdue">
+          <div class="col-auto"><button class="btn btn-primary" type="submit">Generate Overdue Report</button></div>
+          <div class="col-auto"><button class="btn btn-outline-secondary js-print-report" type="button">Download/Print</button></div>
+        </form>
+      </div>
+      <div class="tab-pane fade {% if report_type == 'borrowing' %}show active{% endif %}" id="tab-borrowing">
+        <form method="post" action="{{ url_for('admin.reports') }}" class="row g-2 js-disable-on-submit">
+          <input type="hidden" name="reportType" value="borrowing">
+          <div class="col-md-3"><input type="date" class="form-control" name="startDate" required></div>
+          <div class="col-md-3"><input type="date" class="form-control" name="endDate" required></div>
+          <div class="col-auto"><button class="btn btn-primary" type="submit">Generate Borrowing Report</button></div>
+          <div class="col-auto"><button class="btn btn-outline-secondary js-print-report" type="button">Download/Print</button></div>
+        </form>
+      </div>
+      <div class="tab-pane fade {% if report_type == 'inventory' %}show active{% endif %}" id="tab-inventory">
+        <form method="post" action="{{ url_for('admin.reports') }}" class="row g-2 js-disable-on-submit">
+          <input type="hidden" name="reportType" value="inventory">
+          <div class="col-auto"><button class="btn btn-primary" type="submit">Generate Inventory Report</button></div>
+          <div class="col-auto"><button class="btn btn-outline-secondary js-print-report" type="button">Download/Print</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body" id="reportOutput">
+    <h2 class="h6 mb-3">Report Output</h2>
+    {% if report_html %}
+      {{ report_html|safe }}
+    {% else %}
+      <p class="text-muted mb-0">Generate a report to display data.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll(".js-print-report").forEach(function (btn) {
+    btn.addEventListener("click", function () { window.print(); });
+  });
+</script>
+{% endblock %}

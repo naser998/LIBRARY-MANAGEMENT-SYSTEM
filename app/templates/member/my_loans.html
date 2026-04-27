@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}My Loans - LMS{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h4 mb-0"><i class="fa-solid fa-receipt me-2 text-primary"></i>My Loans</h1>
+      <a href="{{ url_for('member.search') }}" class="btn btn-outline-primary btn-sm">Search Books</a>
+    </div>
+
+    <ul class="nav nav-pills mb-3" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#loansTab" type="button">Loans</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reservationsTab" type="button">Reservations</button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="loansTab">
+        <div class="table-responsive">
+      <table class="table table-hover align-middle js-data-table">
+        <thead>
+          <tr>
+            <th>Loan ID</th>
+            <th>Book ID</th>
+            <th>Borrow Date</th>
+            <th>Due Date</th>
+            <th>Return Date</th>
+            <th>Status</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in loans %}
+            <tr>
+              <td>{{ loan.loanID }}</td>
+              <td>{{ loan.bookID }}</td>
+              <td>{{ loan.borrowDate }}</td>
+              <td class="{% if loan.status.value != 'RETURNED' and loan.dueDate < today %}text-danger fw-semibold{% endif %}">
+                {{ loan.dueDate }}
+              </td>
+              <td>{{ loan.returnDate or '-' }}</td>
+              <td>
+                {% if loan.status.value == 'RETURNED' %}
+                  <span class="badge text-bg-secondary">Returned</span>
+                {% elif loan.status.value == 'OVERDUE' %}
+                  <span class="badge text-bg-danger">Overdue</span>
+                {% else %}
+                  <span class="badge text-bg-primary">Active</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                {% if loan.status.value != 'RETURNED' %}
+                  <form method="post" action="{{ url_for('member.return_book') }}" class="d-inline js-disable-on-submit">
+                    <input type="hidden" name="loanID" value="{{ loan.loanID }}">
+                    <button type="submit" class="btn btn-warning btn-sm"><i class="fa-solid fa-rotate-left me-1"></i>Return</button>
+                  </form>
+                  {% if loan.status.value == 'ACTIVE' %}
+                    {% if loan.deliveryRequest and loan.deliveryRequest.status == 'pending' %}
+                      <form method="post" action="{{ url_for('member.cancel_delivery', delivery_id=loan.deliveryRequest.id) }}" class="d-inline js-disable-on-submit">
+                        <button type="submit" class="btn btn-outline-danger btn-sm ms-1">Cancel Delivery</button>
+                      </form>
+                    {% else %}
+                      <a href="{{ url_for('member.request_delivery', loan_id=loan.loanID) }}" class="btn btn-outline-primary btn-sm ms-1">Request Delivery</a>
+                    {% endif %}
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted small">Completed</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="text-center text-muted py-4">No loans found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="reservationsTab">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Book Title</th>
+                <th>Reserved At</th>
+                <th>Expires At</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for reservation in reservations %}
+                <tr>
+                  <td>{{ reservation.book.title }}</td>
+                  <td>{{ reservation.reserved_at }}</td>
+                  <td>{{ reservation.expires_at }}</td>
+                  <td class="text-end">
+                    <form method="post" action="{{ url_for('member.cancel_reservation', reservation_id=reservation.id) }}" class="d-inline js-disable-on-submit">
+                      <button class="btn btn-outline-danger btn-sm" type="submit">Cancel</button>
+                    </form>
+                  </td>
+                </tr>
+              {% else %}
+                <tr><td colspan="4" class="text-center text-muted py-4">No active reservations.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

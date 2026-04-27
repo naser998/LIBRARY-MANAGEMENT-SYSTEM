@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Search Books - LMS{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-body">
+    <h1 class="h4 mb-3"><i class="fa-solid fa-magnifying-glass me-2 text-primary"></i>Search Books</h1>
+    <form method="post" action="{{ url_for('member.search') }}" class="row g-2 js-disable-on-submit">
+      <div class="col-md-10">
+        <label for="query" class="visually-hidden">Search query</label>
+        <input id="query" class="form-control form-control-lg" name="query" placeholder="Search by title, author, ISBN, or genre" value="{{ query or '' }}" required>
+      </div>
+      <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-primary btn-lg"><i class="fa-solid fa-search me-1"></i>Search</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3">
+  {% for book in books %}
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex justify-content-between mb-2">
+            <h2 class="h6 mb-0">{{ book.title }}</h2>
+            {% if book.availableCopies > 0 %}
+              <span class="badge text-bg-success">Available {{ book.availableCopies }}</span>
+            {% else %}
+              <span class="badge text-bg-danger">Unavailable</span>
+            {% endif %}
+          </div>
+          <p class="mb-1"><i class="fa-regular fa-user me-1 text-muted"></i>{{ book.author }}</p>
+          <p class="mb-1"><i class="fa-solid fa-tag me-1 text-muted"></i>{{ book.genre }}</p>
+          <p class="mb-1"><i class="fa-solid fa-barcode me-1 text-muted"></i>{{ book.isbn }}</p>
+          <p class="mb-3"><i class="fa-solid fa-location-dot me-1 text-muted"></i>{{ book.location }}</p>
+          <div class="mt-auto d-grid gap-2">
+            <a class="btn btn-outline-secondary" href="{{ url_for('member.book_detail', book_id=book.bookID) }}">View Details</a>
+            <form method="post" action="{{ url_for('member.borrow_book') }}" class="js-disable-on-submit">
+            <input type="hidden" name="bookID" value="{{ book.bookID }}">
+            <button class="btn btn-primary w-100" {% if book.availableCopies <= 0 %}disabled{% endif %}>Borrow</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="col-12">
+      <div class="card"><div class="card-body text-center text-muted py-5">No books found. Try another query.</div></div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
